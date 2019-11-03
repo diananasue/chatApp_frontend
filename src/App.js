@@ -13,6 +13,7 @@ export default class App extends React.Component {
       messages: [],
       currentName: "",
       currentMessage: "",
+      update: false,
     }
     this.addNameInfo = this.addNameInfo.bind(this)
     this.addMessageInfo = this.addMessageInfo.bind(this)
@@ -20,23 +21,26 @@ export default class App extends React.Component {
     this.getMessages = this.getMessages.bind(this)
 
   }
-  async getMessages() {
-    try {
-      const messages = (await axios.get(`/message`)).data
+  getMessages() {
+    // try {
+    axios.get(`/message`).then((data) => {
+      const messages = data.data
       console.log(messages)
       if (messages.length !== this.state.messages.length)
         this.setState({ messages: messages })
+    })
 
-    } catch (err) {
-      console.log(`GET - ${err}`)
-    }
 
+    // } catch (err) {
+    // console.log(`GET - ${err}`)
   }
+
+
 
   async addMessage() {
     try {
       await axios.post('/message', { name: this.state.currentName, message: this.state.currentMessage })
-      this.getMessages()
+      this.setState({ update: true })
     } catch (err) {
       console.log(`sending message error: ${err}`)
     }
@@ -56,6 +60,7 @@ export default class App extends React.Component {
   }
 
   render() {
+
     return (
       <div className="container">
         <br></br>
@@ -68,6 +73,7 @@ export default class App extends React.Component {
           <br></br>
           <button className="btn btn-success" onClick={this.addMessage}>Send</button>
         </div>
+        {this.state.update && this.getMessages()}
         {this.state.messages.map(message => {
           return (
             <div>
